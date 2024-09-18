@@ -356,6 +356,69 @@ Terrain Mapper provides a Swagger API interface for testing and exploring backen
     2. Provide the necessary GeoJSON geometry and select one of the recommended `tif_url` files.
     3. Execute the request to receive min and max raster values for the specified area.
 
+## Deploying the Application Locally
 
+To run the **Terrain Mapper** application on your local machine, follow the instructions below. The application only requires data to be downloaded and docker for running the app
 
+### Data Section
 
+Before running the application, you'll need to download the necessary raster and vector data, as well as the database files.
+
+1. **Raster Data**
+   - The raster data needs to be downloaded into the `data/raster/` folder.
+   - Please refer to the [Raster Data Readme](data/raster/README.md) for instructions on where and how to download the data.
+
+2. **Vector Data**
+   - The vector data needs to be downloaded into the `data/vector/` folder.
+   - For details on how to obtain this data, refer to the [Vector Data Readme](data/vector/README.md).
+
+3. **Database**
+   - The database files should be downloaded and stored in the `db/` folder.
+   - For guidance on how to get these files, check the [Database Readme](db/README.md).
+
+### Prerequisites
+
+The only prerequisite for running this application locally is **Docker**. You can download Docker from the following sources, depending on your operating system:
+
+- **Windows**: [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop)
+- **Mac**: [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop)
+- **Linux**: [Install Docker on Linux](https://docs.docker.com/engine/install/)
+
+Ensure that Docker is installed and running before proceeding with the deployment steps.
+
+### Cloning the Repository
+
+First, you'll need to clone the **Terrain Mapper** repository to your local machine. Run the following command in your terminal:
+
+```
+git clone https://github.com/purijs/terrain-mapper.git
+cd terrain-mapper
+```
+
+### Deploying the Application
+
+Once the repository is cloned, follow these steps to deploy the application locally using Docker Swarm:
+
+- Initialize Docker Swarm
+
+```
+docker swarm init
+```
+
+- Deploy Docker Services
+
+```
+docker stack deploy --compose-file app/docker-compose.yml credium
+```
+
+This will start the various services (frontend, backend, raster titiler, vector tileserver, and monitoring) as defined in the Docker Compose file.
+
+### Warning: Port Availability
+
+Make sure the following ports are free on your local machine before deploying the application, as they will be used by the services:
+
+- **9200**: Dozzle (Docker logs UI)
+- **8081**: Frontend (App UI)
+- **8080**: Backend (API)
+- **8000**: Raster Tililer (Raster tiles)
+- **9100**: Vector Tileserver (Vector tiles)
