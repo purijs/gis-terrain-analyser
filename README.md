@@ -29,7 +29,7 @@
 
 ## Overview
 
-`Terrain Mapper` is PoC application that uses a combination of Digital Terrain Data ([source][https://opengeodata.lgl-bw.de/#/(sidenav:product/3)]) and building footprints for 3 cities in Germany. The terrain data is interpolated as raster and different analytical layers are dervied from the interpolation. User can visually make interpretations, interact with app to get insights for specific footprints and developers can use API endpoints to extract data for machine learning purposes. The application runs in Docker Swarm environment, with 5 services to simulate a scalable workload.
+`Terrain Mapper` is PoC application that uses a combination of Digital Terrain Data ([source](https://opengeodata.lgl-bw.de/#/(sidenav:product/3))) and building footprints for 3 cities in Germany. The terrain data is interpolated as raster and different analytical layers are dervied from the interpolation. User can visually make interpretations, interact with app to get insights for specific footprints and developers can use API endpoints to extract data for machine learning purposes. The application runs in Docker Swarm environment, with 5 services to simulate a scalable workload.
 
 ## Features
 
@@ -195,3 +195,167 @@
 - Utilizes technologies like FastAPI, Rasterio, GeoPandas, TiTiler, Dask-GeoPandas and Docker for spatial data processing and visualization
 
 ---
+
+## Database
+
+Terrain Mapper utilizes a **file-based spatial partitioning system** inspired by Hive's partitioning strategy, enhanced with spatial indexing through [PyGeohash](https://pypi.org/project/pygeohash/). This approach enables efficient data storage and rapid query responses without the overhead of managing a traditional database system.
+
+### **Structure and Organization**
+
+- **Spatial Partitioning with Geohash:**
+  - The entire dataset is partitioned based on the footprint locations using Geohash at **resolution 6**. Each Geohash string at this resolution represents an area approximately 1.2 kilometers by 0.6 kilometers, balancing granularity and performance.
+  
+- **Directory-Based Storage:**
+  - The database is organized into a hierarchical folder structure where each top-level folder corresponds to a unique Geohash identifier.
+  - **Example Structure:**
+    ```
+    /db/
+      ├── u4pruyd/
+      │   ├── buildings.parquet
+      │   └── parcels.parquet
+      ├── u4pruyf/
+      │   ├── buildings.parquet
+      │   └── parcels.parquet
+      └── ...
+    ```
+  - **Files Within Each Geohash Folder:**
+    - `buildings.parquet`: Contains building footprint data within the Geohash area.
+    - `parcels.parquet`: Contains parcel boundary data within the Geohash area.
+    - `rasters`: (Futuristic) Raster can also be divided by these partitions, however, wasn't implemented in this PoC
+  
+### **Query Handling**
+
+When a user submits a polygon query through the API endpoint, the system performs the following steps to retrieve relevant data:
+
+1. **Geohash Calculation:**
+   - The input polygon's bounding box is analyzed to determine all overlapping Geohash partitions at **resolution 6** using the `GeohashService` class.
+   
+2. **Partition Identification:**
+   - Based on the calculated Geohashes, the system identifies the corresponding folders within the `/db/` directory.
+   
+3. **Data Retrieval:**
+   - The `BuildingService` class accesses the relevant `buildings.parquet` and `parcels.parquet` files from the identified Geohash partitions.
+   - Utilizing GeoPandas, the service performs spatial joins to filter and retrieve only those records that intersect with the input polygon.
+   
+4. **Multiprocessing for Scalability:**
+   - To handle multiple Geohash partitions concurrently, the `BuildingService` employs Python's `multiprocessing` module. This parallel processing significantly reduces query response times, especially for large and complex polygons spanning numerous partitions.
+
+### **Advantages of the Spatial File-Based Database**
+
+- **Performance and Speed:**
+  - **Efficient Data Access:** Spatial partitioning ensures that only relevant data partitions are accessed during a query, minimizing I/O operations.
+  - **Parallel Processing:** Leveraging multiprocessing allows for simultaneous data retrieval from multiple partitions, significantly reducing query times.
+
+- **Scalability:**
+  - **No Database Overhead:** Being file-based eliminates the need for a separate database management system, simplifying deployment and scaling.
+  - **Flexible Storage:** Easily accommodates growing datasets by simply adding more Geohash partitions without restructuring existing data. This solution can also be migrated to cloud based object storate like Azure Blob, as is
+
+- **Cost-Effective:**
+  - Reduced over-head of deploying and managing servers for a database system reduces overall costs to maintain the system as object storage is comparatively cheaper
+
+- **Flexibility:**
+  - **Adaptable Partitioning:** Geohash-based partitioning can be easily adjusted by changing the resolution, allowing for different levels of data granularity as needed.
+
+---
+
+## How To Use The App
+
+Currently, the application has data for only three cities: Karlsruhe, Stuttgart and Tiengen. You can click on either of locations to start your anaylsis. Stuttgart and Tiengen are observed to have interesting results
+
+### Raster Layers
+
+You can load these layers individually or overlay them for comprehensive analysis.
+
+1. **Slope**
+   - **Description**: Represents the steepness or incline of the terrain. Higher slope values indicate steeper areas. Interpolated from DTM points
+   
+2. **Aspect**
+   - **Description**: Indicates the compass direction that a slope faces. It helps in understanding sun exposure and wind patterns. Dervied from interpolated slope raster
+   
+3. **Tri (Topographic Ruggedness Index)**
+   - **Description**: Measures the ruggedness of the terrain by analyzing the variation in elevation. Dervied from interpolated slope raster
+   
+4. **TPI (Topographic Position Index)**
+   - **Description**: Identifies the topographic position of each cell relative to its surroundings, distinguishing between peaks, valleys, and flat areas. Dervied from interpolated slope raster
+   
+5. **Solar Potential**
+   - **Description**: Assesses the potential for solar energy generation based on slope and aspect. 
+   
+6. **Soil Erosion Risk**
+   - **Description**: Evaluates the risk of soil erosion in different terrain sections, considering factors like slope and soil properties.
+   
+7. **Terrain Risk**
+   - **Description**: A composite layer that combines multiple factors (excluding solar potential) to provide an overall risk assessment of the terrain.
+
+### Vector Layers
+
+In addition to raster data, buildings and parcels are also included for rendering
+
+### Layer Loading and Customization
+
+Users have the flexibility to load multiple layers simultaneously for their analysis:
+
+- **Overlaying Layers**: You can load a vector layer such as **Buildings** and then overlay it with a raster layer like **Solar Potential** to visualize how building locations correlate with solar output.
+- **Layer Management**: Toggle layers on and off to focus on specific data points or to declutter the map view.
+
+### Interactive Features
+
+- **Drawing Polygons**
+  - **Usage**: Draw a polygon over an area of interest to perform detailed footprint analysis and assess surrounding terrain variations.
+  
+- **Dropping Pins**
+  - **Usage**: Place a pin on a specific location to retrieve immediate terrain data and insights for that footprint.
+  
+- **Detailed Analysis**
+  - Upon interacting with the map (drawing a polygon or dropping a pin), the app provides a reports on the selected area's footprint and its surrounding environment.
+
+### Usage Scenarios
+
+1. **Urban Planning**
+   - Analyze building placements relative to terrain features to optimize infrastructure development.
+   
+2. **Environmental Assessment**
+   - Evaluate soil erosion risks and terrain ruggedness to inform conservation efforts.
+   
+3. **Renewable Energy Planning**
+   - Assess solar potential across different zones to identify optimal locations for solar panel installations.
+
+### Important Warning
+
+- **Polygon Size Recommendation**: For optimal performance and accurate results, **draw small polygons** that encompass **5-10 buildings**. Large polygons may lead to longer processing times and less precise analyses.
+
+### Tracking and Monitoring Requests
+
+Users can monitor their polygonal or point-based requests through the Infrastructure Dashboard:
+
+- **Tracking Steps**:
+  1. Navigate to the **Infrastructure Monitor**.
+  2. Select the `credium_backend.1` container.
+  3. View the logs for FastAPI endpoint interactions related to your requests (Polygonal/Point requests only)
+
+### Testing with Swagger API
+
+Terrain Mapper provides a Swagger API interface for testing and exploring backend endpoints:
+
+- **Swagger API Documentation**: [Swagger API](https://terrain-mapper.example.com/docs)
+  
+- **Testing the `/rasterstats` Endpoint**:
+  - **Purpose**: Clip raster files based on GeoJSON geometries and retrieve min/max values
+  - **Supported `tif_url` Values**:
+    - `cog_global_solar_potential.tif`
+    - `cog_merged_aspect.tif`
+    - `cog_merged_tpi.tif`
+    - `cog_global_terrain_risk.tif`
+    - `cog_merged_roughness.tif`
+    - `cog_merged_tri.tif`
+    - `cog_global_terrain_ser.tif`
+    - `cog_merged_slope.tif`
+    
+  - **Usage**:
+    1. Navigate to the `/rasterstats` endpoint in the Swagger UI.
+    2. Provide the necessary GeoJSON geometry and select one of the recommended `tif_url` files.
+    3. Execute the request to receive min and max raster values for the specified area.
+
+
+
+
