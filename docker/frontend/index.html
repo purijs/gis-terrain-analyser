@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terrain Analysis</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.3.0/mapbox-gl-draw.css" rel="stylesheet" />
+    
+    <style>
+        #menu {
+            background: #fff;
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            left: 10px; /* Retained for better placement */
+            border-radius: 3px;
+            width: 180px; /* Retained width for layout */
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            font-family: 'Open Sans', sans-serif;
+            padding: 10px;
+        }
+
+        #menu h5 {
+            margin: 10px 0 5px 0;
+            font-weight: bold;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            padding-bottom: 5px;
+        }
+
+        #menu a {
+            font-size: 13px;
+            color: #404040;
+            display: block;
+            margin: 5px 0;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 3px;
+            text-align: left;
+        }
+
+        #menu a:hover {
+            background-color: #f0f0f0;
+            color: #3887be;
+        }
+
+        #menu a.active {
+            background-color: #3887be;
+            color: #ffffff;
+        }
+
+        #menu a.active:hover {
+            background: #3074a4;
+        }
+
+        #raster-menu a, #vector-menu a {
+            text-align: left;
+            padding-left: 20px; /* Indent for hierarchy */
+        }
+
+        #menu a:last-child, #raster-menu a:last-child, #vector-menu a:last-child {
+            border: none;
+        }
+
+        #map {
+            width: 100%;
+            height: 99vh;
+        }
+
+        .content-area {
+            height: 99vh;
+            overflow-y: auto;
+        }
+
+        .content-block {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        /* Warning Alert Styling */
+        .alert-custom {
+            margin-bottom: 20px;
+        }
+
+        /* Developer Tools and Infra Monitor Links Styling */
+        .top-links a {
+            font-size: 14px;
+            color: #007bff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        .top-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Legend Styling */
+        #legend {
+            margin-top: 20px;
+        }
+
+        #legend-title {
+            margin-bottom: 10px;
+        }
+
+        /* Progress Bar Styling */
+        .progress {
+            height: 25px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Modal Image Styling */
+        .modal-img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Map Section -->
+            <div class="col-md-8">
+                <div id="menu">
+                    <h5>Raster Layers</h5>
+                    <div id="raster-menu"></div>
+                    <h5>Vector Layers</h5>
+                    <div id="vector-menu"></div>
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <!-- Sidebar Content Section -->
+            <div class="col-md-4">
+                <h2 style="text-align: center; margin-top: 25px;">Terrain Analysis</h2>
+                <div class="content-area">
+                    <!-- Developer Tools and Infra Monitor Links -->
+                    <div class="content-block text-center top-links">
+                        <a href="http://3.124.67.243:8080/docs" target="_blank">Developer Portal</a> | 
+                        <a href="http://3.124.67.243:9200/" target="_blank">Infrastructure Monitor</a>
+                    </div>
+                    
+                    <hr>
+                        <div class="container text-center">
+                            <div class="row">
+                                <div class="col" id="Karlsruhe">
+                                    <a href="#">Karlsruhe</a>
+                                </div>
+                                <div class="col" id="Stuttgart">
+                                    <a href="#">Stuttgart</a>
+                                </div>
+                                <div class="col" id="Tiengen">
+                                    <a href="#">Tiengen</a>
+                                </div>
+                            </div>
+                        </div>
+                    <hr>
+                    
+                    <!-- Legend Section -->
+                    <div id="legend" class="container text-center">
+                        <h4 id="legend-title">Legend</h4>
+                        <div id="legend-content">
+                        </div>
+                        <hr/>
+                    </div>                    
+    
+                    <!-- Warning Alert -->
+                    <div class="alert alert-warning alert-custom" role="alert">
+                        <strong>Warning:</strong> Draw small boundaries, covering only a few buildings to get instant results
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress" id="progressBar">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                    </div>
+
+                    <!-- Insights Display -->
+                    <div id="insights">
+                        <!-- Insights data will be populated here -->
+                    </div>
+    
+                    <!-- Footprint Analysis Section -->
+                    <div class="content-block">
+                        <h4>Footprint Analysis</h4>
+
+                        <p>
+                            <strong>Insights Extracted:</strong><br>
+                            <ul>
+                                <li><b>Zonal-level Variation:</b> The building footprint is divided into North, West, East, and South zones. For each zone, mean solar, aspect, and slope values are calculated from raster data sources. Building IDs are retrieved from Parquet partitions and used to highlight vectors on the map. Due to scaling constraints, only 10 footprints are processed at random within the provided polygon.</li>
+                                <li><b>Neighborhood Variation:</b> A buffer is drawn around the building geometry, and the building footprint itself is removed using the difference operation. The same statistics (mean solar, aspect, and slope) are provided for the buffered neighborhood region.</li>
+                            </ul>
+                        </p>
+
+                        <!-- Difference Highlighting Section -->
+                        <h5>Difference Between Zonal-level Variation and Neighborhood Variation:</h5>
+                        <ul>
+                            <li><strong>Zonal-level Variation:</strong> Focuses on internal divisions of the building footprint to analyze terrain variations directly around the building.</li>
+                            <li><strong>Neighborhood Variation:</strong> Examines the surrounding area by to understand the broader terrain context</li>
+                        </ul>
+
+                        <div class="button-group"></div>
+                            <!-- Button 1: Zonal-level Variation Example -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#zonalModal">
+                                Zonal Analysis Image
+                            </button>
+
+                            <!-- Button 2: Neighborhood Variation Example -->
+                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#neighborhoodModal">
+                                Neighborhood Analysis Image
+                            </button>
+                        </div>
+
+                        <!-- Modal for Zonal-level Variation Image -->
+                        <div class="modal fade" id="zonalModal" tabindex="-1" aria-labelledby="zonalModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="zonalModalLabel">Zonal-level Variation Example</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <img src="path_to_zonal_image.jpg" alt="Zonal-level Variation" class="modal-img">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal for Neighborhood Variation Image -->
+                        <div class="modal fade" id="neighborhoodModal" tabindex="-1" aria-labelledby="neighborhoodModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="neighborhoodModalLabel">Neighborhood Variation Example</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Placeholder for Neighborhood Variation Image -->
+                                        <img src="path_to_neighborhood_image.jpg" alt="Neighborhood Variation" class="modal-img">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    <!-- Mapbox GL JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.3.0/mapbox-gl-draw.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        
+        document.getElementById('legend').style.display = 'none'
+        document.getElementById('progressBar').style.display = 'none'
+
+        function addInsightsToHTML(buildingReports) {
+            const insightsContainer = document.getElementById('insights');
+            insightsContainer.innerHTML = '';  // Clear previous insights
+    
+            // Loop through each building report and dynamically create HTML
+            buildingReports.forEach((report, index) => {
+                // Create a collapsible card for each building report
+                const card = `
+                    <div class="card my-3">
+                        <div class="card-header" id="heading${index}">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${index}" aria-expanded="true" aria-controls="collapse${index}">
+                                    Building ID: ${report.building_id}
+                                </button>
+                            </h5>
+                        </div>
+    
+                        <div id="collapse${index}" class="collapse" aria-labelledby="heading${index}" data-parent="#insights">
+                            <div class="card-body">
+                                <h6>Zonal Variation</h6>
+                                ${generateZonalVariationTable(report.zonal_variation_text)}
+                                
+                                <h6>Neighborhood Variation</h6>
+                                ${generateNeighborhoodUnderstandingTable(report.neighborhood_understanding_text)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+    
+                // Append the card to the insights container
+                insightsContainer.innerHTML += card;
+            });
+        }
+    
+        // Function to generate a table for Zonal Variation
+        function generateZonalVariationTable(zonalText) {
+            return `
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Direction</th>
+                            <th>Slope</th>
+                            <th>Aspect</th>
+                            <th>Solar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.keys(zonalText).map(zone => `
+                            <tr>
+                                <td>${zone.charAt(0).toUpperCase() + zone.slice(1)}</td>
+                                <td>${zonalText[zone].slope}</td>
+                                <td>${zonalText[zone].aspect}</td>
+                                <td>${zonalText[zone].solar}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+    
+        // Function to generate a table for Neighborhood Variation
+        function generateNeighborhoodUnderstandingTable(neighborhoodText) {
+            return `
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Direction</th>
+                            <th>Slope</th>
+                            <th>Aspect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.keys(neighborhoodText).map(direction => `
+                            <tr>
+                                <td>${direction.charAt(0).toUpperCase() + direction.slice(1)}</td>
+                                <td>${neighborhoodText[direction].slope}</td>
+                                <td>${neighborhoodText[direction].aspect}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+    
+        // Initialize Mapbox map
+        mapboxgl.accessToken = 'pk.eyJ1IjoianNwdXJpIiwiYSI6ImNrdjZqanR0cjF1eWoydm92cnk0N2kwemwifQ.YyZs-0Q-WtqS6GHt5O4OLA';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [9.188862, 48.787739],
+            zoom: 12
+        });
+    
+        // Initialize Mapbox Draw controls without any default mode
+        const draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: {
+                polygon: true,
+                point: true,
+                trash: true
+            }
+        });
+        
+        map.addControl(draw);
+    
+        map.on('draw.create', async function (event) {
+            const features = event.features;
+            console.log('Drawn features:', features);
+    
+            // Post the drawn polygon to FastAPI
+            const geojson = {
+                "type": "FeatureCollection",
+                "features": features
+            };
+    
+            try {
+                document.getElementById('progressBar').style.display = 'grid';
+    
+                const response = await fetch('http://3.124.67.243:8080/stats', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ geojson })
+                });
+    
+                const result = await response.json();
+                console.log('Polygon posted successfully:', result);
+                
+                document.getElementById('progressBar').style.display = 'none';
+                addInsightsToHTML(result.building_reports);
+    
+                // Highlight buildings in vector tile layer
+                const buildingIds = result.building_reports.map(report => report.building_id);
+                
+                // Remove existing highlight layer if it exists
+                if (map.getLayer('highlight-buildings')) {
+                    map.removeLayer('highlight-buildings');
+                }
+                if (map.getSource('highlight-buildings')) {
+                    map.removeSource('highlight-buildings');
+                }
+    
+                // Add a new source for highlighted buildings
+                map.addSource('highlight-buildings', {
+                    'type': 'vector',
+                    'tiles': ['http://3.124.67.243:9100/data/buildings/{z}/{x}/{y}.pbf'],
+                    'minzoom': 0,
+                    'maxzoom': 14
+                });
+    
+                // Add a new layer to highlight buildings
+                map.addLayer({
+                    'id': 'highlight-buildings',
+                    'type': 'fill',
+                    'source': 'highlight-buildings',
+                    'source-layer': 'buildings',
+                    'layout': { 'visibility': 'visible' },
+                    'paint': {
+                        'fill-color': '#00FF00',
+                        'fill-opacity': 0.6
+                    },
+                    'filter': ['in', 'gmlid', ...buildingIds]
+                });
+    
+            } catch (error) {
+                console.error('Error posting polygon:', error);
+                document.getElementById('progressBar').style.display = 'none';
+            }
+        });
+        
+        const locations = {
+            Karlsruhe: [8.403653, 49.006889],
+            Stuttgart: [9.182932, 48.775846],
+            Tiengen: [8.23, 47.612]
+        };
+    
+        // Add click event listeners to the divs
+        document.getElementById('Karlsruhe').addEventListener('click', function() {
+            map.flyTo({ center: locations.Karlsruhe, zoom: 12 });
+        });
+    
+        document.getElementById('Stuttgart').addEventListener('click', function() {
+            map.flyTo({ center: locations.Stuttgart, zoom: 12 });
+        });
+    
+        document.getElementById('Tiengen').addEventListener('click', function() {
+            map.flyTo({ center: locations.Tiengen, zoom: 12 });
+        });
+    
+        // List of raster files with custom layer names
+        const rasterFiles = {
+            'cog_merged_slope.tif': 'Slope',
+            'cog_merged_aspect.tif': 'Aspect',
+            'cog_merged_tri.tif': 'Terrain Roughness',
+            'cog_merged_tpi.tif': 'Terrain Position Index',
+            'cog_global_solar_potential.tif': 'Solar Potential',
+            'cog_global_terrain_ser.tif': 'Soil Erosion Risk',
+            'cog_global_terrain_risk.tif': 'Terrain Risk'
+        };
+    
+        function updateLegend(layerName, min, max) {
+            const legendContainer = document.getElementById('legend');
+            const legendContent = document.getElementById('legend-content');
+            const legendTitle = document.getElementById('legend-title');
+    
+            // Set the title based on the layer name
+            legendTitle.textContent = rasterFiles[layerName];
+    
+            // Update the content with min and max values
+            legendContent.innerHTML = `
+                <div>Min: ${min}</div>
+                <div>Max: ${max}</div>
+                <div style="background: linear-gradient(to right, #4053C7, #DDDCDB, #BB192A); width: 100%; height: 20px;"></div>
+            `;
+    
+            // Show the legend
+            legendContainer.style.display = 'block';
+        }
+        
+        // Function to extract fileName from layerId
+        function fileNameFromLayer(layerId) {
+            for (const [fileName, displayName] of Object.entries(rasterFiles)) {
+                if (`${fileName.split('.')[0]}-layer` === layerId) {
+                    return fileName;
+                }
+            }
+            return null;
+        }
+        
+        // Helper function to create and append layer toggle links
+        function addLayerToggleLink(layerName, menuContainer, displayName) {
+            const link = document.createElement('a');
+            link.textContent = displayName;
+            link.href = '#';
+            link.className = '';
+    
+            link.onclick = async function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+    
+                const layerId = `${layerName.split('.')[0]}-layer`;
+                const rasterName = layerName.split('.')[0];
+    
+                if (map.getLayer(layerId)) {
+                    // Layer exists, toggle visibility
+                    const visibility = map.getLayoutProperty(layerId, 'visibility');
+    
+                    if (visibility === 'visible') {
+                        map.setLayoutProperty(layerId, 'visibility', 'none');
+                        this.className = '';
+                    } else {
+                        map.setLayoutProperty(layerId, 'visibility', 'visible');
+                        this.className = 'active';
+                    }
+                } else {
+                    // Layer does not exist, check if source exists
+                    if (!map.getSource(rasterName)) {
+                        // Fetch statistics and add source
+                        try {
+                            const bounds = map.getBounds();
+                            const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
+    
+                            // Convert bbox to GeoJSON
+                            const geojson = {
+                                "type": "FeatureCollection",
+                                "features": [
+                                    {
+                                        "type": "Feature",
+                                        "geometry": {
+                                            "type": "Polygon",
+                                            "coordinates": [[
+                                                [bbox[0], bbox[1]],
+                                                [bbox[2], bbox[1]],
+                                                [bbox[2], bbox[3]],
+                                                [bbox[0], bbox[3]],
+                                                [bbox[0], bbox[1]]
+                                            ]]
+                                        },
+                                        "properties": {}
+                                    }
+                                ]
+                            };
+    
+                            console.log("Posting GeoJSON for bounds:", geojson);
+    
+                            // Post GeoJSON to the COG statistics endpoint
+                            const requestData = {
+                                geojson: geojson,  // The GeoJSON object
+                                tif_url: layerName  // The URL of the TIFF file
+                            };
+                            
+                            const response = await fetch('http://3.124.67.243:8080/rasterstats', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(requestData)
+                            });
+    
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+    
+                            const data = await response.json();
+                            console.log("Received statistics:", data);
+    
+                            // Add COG source with dynamic rescale and palette
+                            map.addSource(rasterName, {
+                                'type': 'raster',
+                                'tiles': [
+                                    `http://3.124.67.243:8000/cog/tiles/WebMercatorQuad/{z}/{x}/{y}@1x?url=%2Fdata%2F${layerName}&rescale=${data.min},${data.max}&colormap_name=coolwarm`
+                                ],
+                                'tileSize': 256
+                            });
+    
+                            updateLegend(layerName, data.min, data.max);
+                        } catch (error) {
+                            console.error(`Error fetching stats for ${layerName}:`, error);
+                            return;
+                        }
+                    }
+    
+                    // Add raster layer with visibility set to 'visible'
+                    try {
+                        map.addLayer({
+                            'id': layerId,
+                            'type': 'raster',
+                            'source': rasterName,
+                            'layout': {
+                                'visibility': 'visible'
+                            },
+                            'paint': {
+                                'raster-opacity': 0.7
+                            }
+                        });
+                        this.className = 'active';
+                    } catch (error) {
+                        console.error(`Error adding layer ${layerId}:`, error);
+                    }
+                }
+            };
+    
+            menuContainer.appendChild(link);
+        }
+    
+        // Function to add vector layers
+        function addVectorLayers() {
+            // Buildings Layer
+            map.addSource('buildings', {
+                'type': 'vector',
+                'tiles': ['http://3.124.67.243:9100/data/buildings/{z}/{x}/{y}.pbf'],
+                'minzoom': 0,
+                'maxzoom': 14
+            });
+    
+            map.addLayer({
+                'id': 'buildings-layer',
+                'type': 'fill',
+                'source': 'buildings',
+                'source-layer': 'buildings',
+                'layout': { 'visibility': 'none' },
+                'paint': {
+                    'fill-color': '#888888',
+                    'fill-opacity': 0.8
+                }
+            });
+    
+            const vectorMenu = document.getElementById('vector-menu');
+            addLayerToggleLink('buildings', vectorMenu, 'Buildings');
+    
+            // Parcel Layer
+            map.addSource('parcel', {
+                'type': 'vector',
+                'tiles': ['http://3.124.67.243:9100/data/parcel/{z}/{x}/{y}.pbf'],
+                'minzoom': 0,
+                'maxzoom': 14
+            });
+    
+            map.addLayer({
+                'id': 'parcel-layer',
+                'type': 'fill',
+                'source': 'parcel',
+                'source-layer': 'parcel_intersecting_grid',
+                'layout': { 'visibility': 'none' },
+                'paint': {
+                    'fill-color': '#ff0000',
+                    'fill-opacity': 0.8
+                }
+            });
+    
+            addLayerToggleLink('parcel', vectorMenu, 'Parcels');
+        }
+        
+        // Ensure map is fully loaded before adding layers
+        map.on('load', function () {
+            addVectorLayers();
+        });
+        
+        // Initialize raster menu with layer toggle links
+        document.addEventListener('DOMContentLoaded', () => {
+            const rasterMenu = document.getElementById('raster-menu');
+            Object.keys(rasterFiles).forEach(fileName => {
+                const displayName = rasterFiles[fileName];
+                addLayerToggleLink(fileName, rasterMenu, displayName);
+            });
+        });
+        
+        // Function to highlight buildings based on building_id
+        function highlightBuildings(buildingIds) {
+            // Remove existing highlight layer and source if they exist
+            if (map.getLayer('highlight-buildings')) {
+                map.removeLayer('highlight-buildings');
+            }
+            if (map.getSource('highlight-buildings')) {
+                map.removeSource('highlight-buildings');
+            }
+    
+            if (buildingIds.length === 0) {
+                return;
+            }
+    
+            // Add a new source for highlighted buildings
+            map.addSource('highlight-buildings', {
+                'type': 'vector',
+                'tiles': ['http://3.124.67.243:9100/data/buildings/{z}/{x}/{y}.pbf'],
+                'minzoom': 0,
+                'maxzoom': 14
+            });
+    
+            // Add a new layer to highlight buildings
+            map.addLayer({
+                'id': 'highlight-buildings',
+                'type': 'fill',
+                'source': 'highlight-buildings',
+                'source-layer': 'buildings',
+                'layout': { 'visibility': 'visible' },
+                'paint': {
+                    'fill-color': '#00FF00',
+                    'fill-opacity': 0.6
+                },
+                'filter': ['in', 'gmlid', ...buildingIds]
+            });
+        }
+        
+        </script>    
+    
+    
+</body>
+</html>

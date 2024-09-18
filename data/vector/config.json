@@ -1,0 +1,20 @@
+{
+    "options": {
+        "paths": {
+            "root": "/usr/lib/node_modules/tileserver-gl/node_modules/tileserver-gl-styles",
+            "fonts": "fonts",
+            "styles": "styles",
+            "mbtiles": "/data",
+            "pmtiles": "/data"
+        }
+    },
+    "styles": {},
+    "data": {
+        "buildings": {
+            "mbtiles": "buildings.mbtiles"
+        },
+        "parcel": {
+            "mbtiles": "parcel_intersecting_grid.mbtiles"
+        }
+    }
+}

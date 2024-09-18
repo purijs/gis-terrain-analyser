@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+
+  dozzle:
+    image: amir20/dozzle:latest
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 2
+    environment:
+      - DOZZLE_MODE=swarm
+      - DOZZLE_ADDR=:9200
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 9200:9200
+    networks:
+      - appconnector
+      
+
+  frontend:
+    image: credium-fe:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 2
+    networks:
+      - appconnector
+    ports:
+      - "8081:80"
+
+  backend:
+    image: credium-be:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 2
+    volumes:
+      - ${PWD}/data:/var/task/fastapi/data
+      - ${PWD}/db:/var/task/fastapi/db
+    networks:
+      - appconnector
+    ports:
+      - "8080:8080"
+
+  raster-titiler:
+    image: ghcr.io/developmentseed/titiler:latest
+    environment:
+      - PORT=8000
+      - WORKERS_PER_CORE=1
+      - TITILER_API_CORS_ALLOW_METHODS='GET,POST'
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 2
+    volumes:
+      - ${PWD}/data/raster:/data
+    ports:
+      - "8000:8000"
+    networks:
+      - appconnector
+
+  vector-tilserver:
+    image: vector-tileserver:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 2
+    volumes:
+      - ${PWD}/data/vector:/data
+    ports:
+      - "9100:9100"
+    networks:
+      - appconnector
+
+networks:
+  appconnector:
+    driver: overlay
+    attachable: true
