@@ -129,29 +129,6 @@ class StatsResponse(BaseModel):
 # Services
 # ---------------------------
 
-from typing import List, Dict, Optional
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-import rasterio
-from rasterio.mask import mask
-import os
-import numpy as np
-from shapely.geometry import shape, Polygon
-import geopandas as gpd
-import pygeohash as pgh
-import math
-from multiprocessing import Pool, cpu_count
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# ---------------------------
-# Services
-# ---------------------------
-
 class RasterService:
     def __init__(self, raster_paths: Dict[str, str]):
         self.raster_paths = raster_paths
