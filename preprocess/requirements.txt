@@ -1,0 +1,10 @@
+geopandas
+rasterio
+shapely
+tqdm
+numpy
+pyproj
+GDAL
+pandas
+dask-geopandas
+pygeohash
