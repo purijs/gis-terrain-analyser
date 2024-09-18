@@ -9,4 +9,3 @@ fiona
 pygeohash
 geojson
 rasterio
-pytest
