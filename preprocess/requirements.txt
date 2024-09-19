@@ -1,4 +1,5 @@
 geopandas
+dask[complete]
 rasterio
 shapely
 tqdm
