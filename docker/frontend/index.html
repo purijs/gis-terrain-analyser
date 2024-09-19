@@ -191,64 +191,11 @@
                         <p>
                             <strong>Insights Extracted:</strong><br>
                             <ul>
-                                <li><b>Zonal-level Variation:</b> The building footprint is divided into North, West, East, and South zones. For each zone, mean solar, aspect, and slope values are calculated from raster data sources. Building IDs are retrieved from Parquet partitions and used to highlight vectors on the map. Due to scaling constraints, only 10 footprints are processed at random within the provided polygon.</li>
-                                <li><b>Neighborhood Variation:</b> A buffer is drawn around the building geometry, and the building footprint itself is removed using the difference operation. The same statistics (mean solar, aspect, and slope) are provided for the buffered neighborhood region.</li>
+                                <li><b>Zonal-level Variation:</b> The building footprint is divided into North, West, East, and South zones. For each zone, mean solar, aspect, and slope values are calculated from raster data sources. Due to scaling constraints, only 10 footprints are processed at random within the provided polygon.</li>
+                                <li><b>Neighborhood Variation:</b> A buffer is drawn around the building geometry, and the building footprint itself is removed using the difference operation. The same statistics are provided for the buffered neighborhood region.</li>
                             </ul>
                         </p>
-
-                        <!-- Difference Highlighting Section -->
-                        <h5>Difference Between Zonal-level Variation and Neighborhood Variation:</h5>
-                        <ul>
-                            <li><strong>Zonal-level Variation:</strong> Focuses on internal divisions of the building footprint to analyze terrain variations directly around the building.</li>
-                            <li><strong>Neighborhood Variation:</strong> Examines the surrounding area by to understand the broader terrain context</li>
-                        </ul>
-
-                        <div class="button-group"></div>
-                            <!-- Button 1: Zonal-level Variation Example -->
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#zonalModal">
-                                Zonal Analysis Image
-                            </button>
-
-                            <!-- Button 2: Neighborhood Variation Example -->
-                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#neighborhoodModal">
-                                Neighborhood Analysis Image
-                            </button>
-                        </div>
-
-                        <!-- Modal for Zonal-level Variation Image -->
-                        <div class="modal fade" id="zonalModal" tabindex="-1" aria-labelledby="zonalModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="zonalModalLabel">Zonal-level Variation Example</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <img src="path_to_zonal_image.jpg" alt="Zonal-level Variation" class="modal-img">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Modal for Neighborhood Variation Image -->
-                        <div class="modal fade" id="neighborhoodModal" tabindex="-1" aria-labelledby="neighborhoodModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="neighborhoodModalLabel">Neighborhood Variation Example</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <!-- Placeholder for Neighborhood Variation Image -->
-                                        <img src="path_to_neighborhood_image.jpg" alt="Neighborhood Variation" class="modal-img">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    
                     </div>
 
                 </div>
