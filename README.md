@@ -6,9 +6,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/purijs/terrain-mapper/actions?query=workflow%3ACI" target="_blank">
-      <img src="https://github.com/purijs/terrain-mapper/workflows/run-unit-tests.yml/badge.svg" alt="CI Status">
-  </a>
   <a href="https://codecov.io/gh/purijs/terrain-mapper" target="_blank">
       <img src="https://codecov.io/gh/purijs/terrain-mapper/branch/main/graph/badge.svg" alt="Coverage">
   </a>
@@ -21,9 +18,9 @@
 
 **Live Application**: [Terrain Mapper](http://3.124.67.243:8081)
 
-**Wiki Docs**: [Wiki Docs](https://github.com/purijs/terrain-mapper/wiki/Terrain-Mapper)
+**Documentation**: [Wiki Docs](https://github.com/purijs/terrain-mapper/wiki/Terrain-Mapper)
 
-**Infrastructure Dashboard**: [Infra Dashboard](http://3.124.67.243:8080/infra)
+**Infrastructure Dashboard**: [Infra Dashboard](http://3.124.67.243:9200)
 
 ---
 
@@ -89,7 +86,7 @@
 - **Swagger API**: [Access the Swagger API Documentation](http://3.124.67.243:8080/docs)
   - Provides a detailed overview of all available endpoints, request/response schemas, and interactive testing UI
 
-- **Infra Dashboard**: [View the Infrastructure Dashboard](http://3.124.67.243:8080/infra)
+- **Infra Dashboard**: [View the Infrastructure Dashboard](http://3.124.67.243:9200)
   - Provides breif monitoring of all docker services. Python logging is also enabled for the backend service to observe how a request propogates through various functions
 
 ### Geospatial Data Handling
@@ -326,7 +323,7 @@ Users can monitor their polygonal or point-based requests through the Infrastruc
 
 Terrain Mapper provides a Swagger API interface for testing and exploring backend endpoints:
 
-- **Swagger API Documentation**: [Swagger API](https://terrain-mapper.example.com/docs)
+- **Swagger API Documentation**: [Swagger API](http://3.124.67.243:8080/docs)
   
 - **Testing the `/rasterstats` Endpoint**:
   - **Purpose**: Clip raster files based on GeoJSON geometries and retrieve min/max values
