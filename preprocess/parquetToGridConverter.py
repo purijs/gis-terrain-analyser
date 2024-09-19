@@ -1,11 +1,15 @@
 import dask_geopandas as dgpd
+from dask.distributed import Client, LocalCluster
 import geopandas as gpd
 import pandas as pd
 import pygeohash as pgh
 from shapely.geometry import Polygon
 from dask.diagnostics import ProgressBar
-import os
+import os, gc
 
+cluster = LocalCluster(n_workers=os.cpu_count()-1, memory_limit='8GB')
+client = Client(cluster)
+gc.collect()
 
 class GeohashProcessor:
     def __init__(self, parquet_path, resolution, partition_size="75MB"):
