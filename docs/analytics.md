@@ -1,6 +1,6 @@
 User can extract insights from the web application by either dropping a `Point` on a footprint of interest or extract insights for multiple footprints by drawing a `Polygon`.
 
-![](https://github.com/purijs/terrain-mapper/blob/main/images/polygon_analysis.png)
+![](../images/polygon_analysis.png)
 
 The backend is limited to resources and doesn't have any node-scaling, as a result, if you select a big area only 10 random footprints are sampled for processing. On the UI, you'd see the processed buildings in ``green`` color as in the picture above.
 
@@ -12,11 +12,11 @@ The analysis performed in two different ways:
 
 Refer the screenshots below:
 
-![](https://github.com/purijs/terrain-mapper/blob/main/images/zonal_divisions.png)
+![](../images/zonal_divisions.png)
 
 Following kind of table is produced for each Building:
 
-![](https://github.com/purijs/terrain-mapper/blob/main/images/output_table.png)
+![](../images/output_table.png)
 
 * Neighborhood Variation: In this, the opposite is analysed, a small buffer is drawn around the building footprint, the footprint itself is removed so as to only include the ring structure around the building. A similar analysis is performed for the resulting region. This can be useful for example to analyse how the surrounding terrain can create problems for the current footprint
 
