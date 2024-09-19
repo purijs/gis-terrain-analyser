@@ -1,14 +1,11 @@
 # Terrain Mapper
 
 <p align="center">
-  <img width="600" src="https://gisterraindata.s3.eu-central-1.amazonaws.com/720p.gif" alt="Terrain Mapper Screenshot"/>
+  <img width="600" src="" alt="Terrain Mapper Screenshot"/>
   <p align="center">A FastAPI application for terrain mapping and analysis</p>
 </p>
 
 <p align="center">
-  <a href="https://codecov.io/gh/purijs/terrain-mapper" target="_blank">
-      <img src="https://codecov.io/gh/purijs/terrain-mapper/branch/main/graph/badge.svg" alt="Coverage">
-  </a>
   <a href="https://hub.docker.com/r/purijs/terrain-mapper" target="_blank">
       <img src="https://img.shields.io/docker/v/purijs/terrain-mapper?color=%2334D058&label=docker%20hub" alt="Docker">
   </a>
