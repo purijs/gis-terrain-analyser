@@ -13,7 +13,7 @@
 
 ---
 
-**Live Application**: [Terrain Mapper](http://3.124.67.243:8081)
+**Live Application**: [Terrain Mapper](http://3.124.67.243:8081) (Please select 'Continue to Un-Secure Link' if asked, since it's an IP Address)
 
 **Documentation**: [Wiki Docs](docs/)
 
@@ -391,7 +391,7 @@ docker swarm init
 - Deploy Docker Services
 
 ```
-docker stack deploy --compose-file app/docker-compose.yml credium
+docker stack deploy --compose-file docker-compose.yml credium
 ```
 
 This will start the various services (frontend, backend, raster titiler, vector tileserver, and monitoring) as defined in the Docker Compose file.
