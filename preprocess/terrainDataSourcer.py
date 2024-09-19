@@ -11,7 +11,7 @@ class FileProcessor:
     def process_file(file):
         """Process a single xyz file and convert it to GeoParquet format."""
         try:
-            base_directory = "/Users/jspuri/Downloads/dtm/all/"  # Change this to your actual base directory
+            base_directory = "data/input/xyz/" 
             file_path = os.path.join(base_directory, file)
             
             # Read the CSV file and process it
