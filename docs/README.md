@@ -9,21 +9,21 @@ This [repo](../) is the main branch which hosts the following components:
 
 ### Continuous Integration (CI)
 
-The current strategy to merge changes in the main branch is by creating separate `feature` branches, for eg: `feature/0001`. On each commit, there is a CI `unittests` ([YAML File](https://github.com/purijs/terrain-mapper/blob/main/.github/workflows/run-unit-tests.yml)) that is triggered and can be tracked under [Github Actions](https://github.com/purijs/terrain-mapper/actions)
+The current strategy to merge changes in the main branch is by creating separate `feature` branches, for eg: `feature/0001`. On each commit, there is a CI `unittests` ([YAML File](../.github/workflows/run-unit-tests.yml)) that is triggered and can be tracked under Github Actions
 
 Following was the order to setup this application: 
 `Raw Data > PreProcessing > Data Outputs > FastAPI App > Dockerised Deployment`
 
-If you'd like to just use the App and understand how it is built and works, or even deploy it locally with the processed data, [read this](https://github.com/purijs/terrain-mapper/blob/main/README.md)
+If you'd like to just use the App and understand how it is built and works, or even deploy it locally with the processed data, [read this](../README.md)
 
-If you'd like to prepare the data from scratch, [read this](https://github.com/purijs/terrain-mapper/blob/main/preprocess/README.md)
+If you'd like to prepare the data from scratch, [read this](../preprocess/README.md)
 
 ***
 
 ### Conceptual Explanations
 
-1. [Data PreProcessing Workflow](https://github.com/purijs/terrain-mapper/blob/main/docs/preprocessing.md) explains the data preparation steps in [preprocess/](https://github.com/purijs/terrain-mapper/blob/main/preprocess/), _aimed for Developers_
-2. [User Analytics: App Interaction](https://github.com/purijs/terrain-mapper/blob/main/docs/analytics.md) explains how user can infer the analysis made in the UI, _aimed at Business Users_
+1. [Data PreProcessing Workflow](./preprocessing.md) explains the data preparation steps in [preprocess/](https://github.com/purijs/terrain-mapper/blob/main/preprocess/), _aimed for Developers_
+2. [User Analytics: App Interaction](./analytics.md) explains how user can infer the analysis made in the UI, _aimed at Business Users_
 
 ### Possible Improvements/Challenges Encountered
 
