@@ -15,7 +15,7 @@
 
 **Live Application**: [Terrain Mapper](http://3.124.67.243:8081)
 
-**Documentation**: [Wiki Docs](https://github.com/purijs/terrain-mapper/wiki/Terrain-Mapper)
+**Documentation**: [Wiki Docs](docs/)
 
 **Infrastructure Dashboard**: [Infra Dashboard](http://3.124.67.243:9200)
 
