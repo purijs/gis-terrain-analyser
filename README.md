@@ -1,13 +1,13 @@
 # Terrain Mapper
 
 <p align="center">
-  <img width="600" src="https://user-images.githubusercontent.com/your-username/screenshot.png" alt="Terrain Mapper Screenshot"/>
+  <img width="600" src="https://github.com/purijs/terrain-mapper/blob/main/images/demo.gif" alt="Terrain Mapper Screenshot"/>
   <p align="center">A FastAPI application for terrain mapping and analysis</p>
 </p>
 
 <p align="center">
   <a href="https://github.com/purijs/terrain-mapper/actions?query=workflow%3ACI" target="_blank">
-      <img src="https://github.com/purijs/terrain-mapper/workflows/CI/badge.svg" alt="CI Status">
+      <img src="https://github.com/purijs/terrain-mapper/workflows/run-unit-tests.yml/badge.svg" alt="CI Status">
   </a>
   <a href="https://codecov.io/gh/purijs/terrain-mapper" target="_blank">
       <img src="https://codecov.io/gh/purijs/terrain-mapper/branch/main/graph/badge.svg" alt="Coverage">
@@ -19,11 +19,11 @@
 
 ---
 
-**Live Application**: [Terrain Mapper](https://3.124.67.243:8081)
+**Live Application**: [Terrain Mapper](http://3.124.67.243:8081)
 
-**Documentation**: [Swagger API Documentation](https://3.124.67.243:8080/docs)
+**Wiki Docs**: [Wiki Docs](https://github.com/purijs/terrain-mapper/wiki/Terrain-Mapper)
 
-**Infrastructure Dashboard**: [Infra Dashboard](https://3.124.67.243:8080/infra)
+**Infrastructure Dashboard**: [Infra Dashboard](http://3.124.67.243:8080/infra)
 
 ---
 
@@ -86,10 +86,10 @@
 
 ### Application Components
 
-- **Swagger API**: [Access the Swagger API Documentation](https://3.124.67.243:8080/docs)
+- **Swagger API**: [Access the Swagger API Documentation](http://3.124.67.243:8080/docs)
   - Provides a detailed overview of all available endpoints, request/response schemas, and interactive testing UI
 
-- **Infra Dashboard**: [View the Infrastructure Dashboard](https://3.124.67.243:8080/infra)
+- **Infra Dashboard**: [View the Infrastructure Dashboard](http://3.124.67.243:8080/infra)
   - Provides breif monitoring of all docker services. Python logging is also enabled for the backend service to observe how a request propogates through various functions
 
 ### Geospatial Data Handling

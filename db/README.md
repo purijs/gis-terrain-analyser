@@ -6,4 +6,4 @@ Use the following download links if you want to deploy the application from scra
 
 Please ensure the zip file is extracted within this folder only
 
-- [Database Partitions](./db)
+- [Database Partition](https://gisterraindata.s3.eu-central-1.amazonaws.com/db/db.zip)

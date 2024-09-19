@@ -6,5 +6,7 @@ Use the following download links if you want to deploy the application from scra
 
 Please ensure these files are downloaded in this folder only
 
-- [building.mbtiles](./buildings_intersecting_grid.mbtiles)
-- [parcel.mbtiles](./parcel_intersecting_grid.mbtiles)s
+- [buildings.mbtiles](https://gisterraindata.s3.eu-central-1.amazonaws.com/vector/buildings.mbtiles)
+- [parcel.mbtiles](https://gisterraindata.s3.eu-central-1.amazonaws.com/vector/parcel_intersecting_grid.mbtiles)
+
+[tippecanoe](https://github.com/mapbox/tippecanoe) was used for generating mbitles from GPKG files. It does not support parquet as inputs
