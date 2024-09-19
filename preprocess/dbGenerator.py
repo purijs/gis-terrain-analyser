@@ -133,13 +133,13 @@ class GeohashPartitioner:
 if __name__ == "__main__":
 
     # Ideally, Output from parquetToGridConverter.py -> 'data/output/gpkg/geohash_resolution_6.gpkg'
-    geohash_grid_file = '' # Geohash grid file of lower resolution, 6
+    geohash_grid_file = 'data/output/gpkg/geohash_resolution_6.gpkg' # Geohash grid file of lower resolution, 6
 
     # Input parquet files
     dtm_parquet_files = [os.path.join('data/output/parquet/', file) for file in os.listdir('data/output/parquet/')]
     
     buildings_parquet_files = ['data/input/parquet/buildings.parquet']
-    parcels_parquet_files = ['data/input/parquet/parcel.parquet']
+    parcels_parquet_files = ['data/input/parquet/parcels.parquet']
     
     # Output base directory
     output_base_dir = 'data/output/db/'
