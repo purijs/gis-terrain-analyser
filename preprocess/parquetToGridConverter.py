@@ -1,15 +1,13 @@
+import os
+from multiprocessing import get_context
+import gc
 import dask_geopandas as dgpd
-from dask.distributed import Client, LocalCluster
 import geopandas as gpd
 import pandas as pd
 import pygeohash as pgh
 from shapely.geometry import Polygon
 from dask.diagnostics import ProgressBar
-import os, gc
-
-cluster = LocalCluster(n_workers=os.cpu_count()-1, memory_limit='8GB')
-client = Client(cluster)
-gc.collect()
+from dask.distributed import Client, LocalCluster
 
 class GeohashProcessor:
     def __init__(self, parquet_path, resolution, partition_size="75MB"):
@@ -87,24 +85,22 @@ class GeohashProcessor:
         """
         Save the result as a GeoPackage.
         """
-        gdf.to_file(output_path, driver='GPKG')
+        
+        layer_name = os.path.splitext(os.path.basename(output_path))[0]
+        layer_name = layer_name.replace(' ', '_').replace('-', '_')
+        
+        gdf.to_file(output_path, layer=layer_name, driver='GPKG')
         print(f"Result saved to {output_path}")
 
 
 if __name__ == "__main__":
-
-    '''
-    Run this script twice, with precision 6 and 8 as outputs
-    
-    data/output/gpkg/geohash_resolution_6.gpkg
-    data/output/gpkg/geohash_resolution_8.gpkg
-    
-    '''
-    
     parquet_path = "data/output/parquet/*.parquet"
-    output_path = "data/output/gpkg/.gpkg"
-
-    resolution = 
+    output_path = "data/output/gpkg/geohash_resolution_6.gpkg"
+    resolution = 6
+    
+    cluster = LocalCluster(n_workers=os.cpu_count()-1, memory_limit='8GB')
+    client = Client(cluster)
+    gc.collect()
 
     processor = GeohashProcessor(parquet_path, resolution)
     dask_gdf = processor.load_and_repartition_data()
