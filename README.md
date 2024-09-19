@@ -1,7 +1,7 @@
 # Terrain Mapper
 
 <p align="center">
-  <img width="600" src="" alt="Terrain Mapper Screenshot"/>
+  <img width="600" src="https://github.com/purijs/terrain-mapper/blob/main/images/screenshot.png" alt="Terrain Mapper Screenshot"/>
   <p align="center">A FastAPI application for terrain mapping and analysis</p>
 </p>
 
