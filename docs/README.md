@@ -22,8 +22,8 @@ If you'd like to prepare the data from scratch, [read this](https://github.com/p
 
 ### Conceptual Explanations
 
-1. [Data PreProcessing Workflow](https://github.com/purijs/terrain-mapper/docs/preprocessing.md) explains the data preparation steps in [preprocess/](https://github.com/purijs/terrain-mapper/blob/main/preprocess/), _aimed for Developers_
-2. [User Analytics: App Interaction](https://github.com/purijs/terrain-mapper/docs/analytics.md) explains how user can infer the analysis made in the UI, _aimed at Business Users_
+1. [Data PreProcessing Workflow](https://github.com/purijs/terrain-mapper/blob/main/docs/preprocessing.md) explains the data preparation steps in [preprocess/](https://github.com/purijs/terrain-mapper/blob/main/preprocess/), _aimed for Developers_
+2. [User Analytics: App Interaction](https://github.com/purijs/terrain-mapper/blob/main/docs/analytics.md) explains how user can infer the analysis made in the UI, _aimed at Business Users_
 
 ### Possible Improvements/Challenges Encountered
 
