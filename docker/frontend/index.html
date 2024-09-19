@@ -408,13 +408,14 @@
     
         // List of raster files with custom layer names
         const rasterFiles = {
+            'cog_merged_interpolation.tif': 'Interpolated DTM',
             'cog_merged_slope.tif': 'Slope',
             'cog_merged_aspect.tif': 'Aspect',
             'cog_merged_tri.tif': 'Terrain Roughness',
             'cog_merged_tpi.tif': 'Terrain Position Index',
             'cog_global_solar_potential.tif': 'Solar Potential',
             'cog_global_terrain_ser.tif': 'Soil Erosion Risk',
-            'cog_global_terrain_risk.tif': 'Terrain Risk'
+            'cog_global_terrain_risk.tif': 'Global Terrain Risk'
         };
     
         function updateLegend(layerName, min, max) {
