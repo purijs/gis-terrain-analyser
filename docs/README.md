@@ -1,7 +1,7 @@
 This wiki guide will walk you through the various steps, technical decision and methodologies taken to setup this app, in terms of how data was prepared from the given inputs and how can users interpret the analysis they do on the frontend application.
 
 ### Github Setup
-This [repo](https://github.com/purijs/terrain-mapper) is the main branch which hosts the following components:
+This [repo](../) is the main branch which hosts the following components:
 * FastAPI
 * Docker Setup
 * Links to Data
