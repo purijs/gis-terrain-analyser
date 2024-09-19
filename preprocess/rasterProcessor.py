@@ -13,8 +13,14 @@ class RasterProcessor:
         Merge all raster files in the given input directory using GDAL.
         """
         try:
+            
             # Find all .tif files in the input directory
-            raster_files = [os.path.join(self.input_path, file) for file in os.listdir(self.input_path) if file.endswith('.tif')]
+            raster_files = []
+            for root, dirs, files in os.walk(self.input_path):
+                for file in files:
+                    if file.endswith('.tif'):
+                        raster_files.append(os.path.join(root, file))
+
 
             if not raster_files:
                 raise Exception("No .tif files found in the specified directory.")
