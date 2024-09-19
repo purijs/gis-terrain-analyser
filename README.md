@@ -207,17 +207,6 @@ Terrain Mapper utilizes a **file-based spatial partitioning system** inspired by
   
 - **Directory-Based Storage:**
   - The database is organized into a hierarchical folder structure where each top-level folder corresponds to a unique Geohash identifier.
-  - **Example Structure:**
-    ```
-    /db/
-      ├── u4pruyd/
-      │   ├── buildings.parquet
-      │   └── parcels.parquet
-      ├── u4pruyf/
-      │   ├── buildings.parquet
-      │   └── parcels.parquet
-      └── ...
-    ```
   - **Files Within Each Geohash Folder:**
     - `buildings.parquet`: Contains building footprint data within the Geohash area.
     - `parcels.parquet`: Contains parcel boundary data within the Geohash area.
