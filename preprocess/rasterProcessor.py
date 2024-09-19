@@ -26,7 +26,7 @@ class RasterProcessor:
                 raise Exception("No .tif files found in the specified directory.")
 
             # Use gdal_merge.py for merging rasters
-            merge_command = ["gdal_merge.py", "-o", self.output_path, "-co", "COMPRESS=LZW"] + raster_files
+            merge_command = ["gdal_merge.py", "-o", self.output_path, "-co", "COMPRESS=LZW","-a_nodata","0"] + raster_files
             print(f"Running command: {' '.join(merge_command)}")
             subprocess.run(merge_command, check=True)
 
@@ -44,8 +44,7 @@ class RasterProcessor:
                 "gdal_translate",
                 self.input_path,
                 self.output_path,
-                "-of", "COG",
-                "-co", "BIGTIFF=YES"
+                "-of", "COG"
             ]
             print(f"Running command: {' '.join(cog_command)}")
             subprocess.run(cog_command, check=True)
