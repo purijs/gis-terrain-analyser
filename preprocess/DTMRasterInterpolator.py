@@ -38,11 +38,11 @@ class RasterGenerator:
         if result.returncode != 0:
             raise Exception(f"GDAL command failed: {result.stderr.decode('utf-8')}")
 
-    def generate_slope_raster(self):
+    def generate_interpolated_raster(self):
         """Generate the slope raster using gdal_grid"""
         self.convert_parquet_to_gpkg()  # Convert Parquet to GPKG
 
-        output_raster = os.path.join(self.output_base_dir, f"{self.filename}_slope.tif")
+        output_raster = os.path.join(self.output_base_dir, f"{self.filename}_interpolated.tif")
         command = [
             "gdal_grid",
             "-zfield", "height",
@@ -56,49 +56,10 @@ class RasterGenerator:
             self.gpkg_file, output_raster
         ]
         self.run_gdal_command(command)
-        return output_raster
-
-    def generate_analysis_raster(self, raster_type):
-        """Generate analysis rasters (aspect, TRI, TPI, roughness)"""
-        input_raster = os.path.join(self.output_base_dir, f"{self.filename}_slope.tif")
-        output_raster = os.path.join(self.output_base_dir, f"{self.filename}_{raster_type}.tif")
-        command = [
-            "gdaldem", raster_type, input_raster, output_raster,
-            "-co", "COMPRESS=LZW"
-        ]
-        self.run_gdal_command(command)
-        return output_raster
-
-    def reproject_raster(self, input_raster, output_raster):
-        """Reproject a raster to EPSG:4326"""
-        command = [
-            "gdalwarp", "-t_srs", "EPSG:4326", "-r", "bilinear",
-            "-co", "COMPRESS=LZW", "--config", "GDAL_NUM_THREADS", "ALL_CPUS",
-            input_raster, output_raster
-        ]
-        self.run_gdal_command(command)
-
-    def cleanup_files(self, *files):
-        """Delete raw GeoTIFF files or other temporary files after processing"""
-        for file in files:
-            if os.path.exists(file):
-                os.remove(file)
 
     def process_parquet(self):
         """Run the entire pipeline on the given parquet file"""
-        # Step 1: Generate the slope raster
-        slope_raster = self.generate_slope_raster()
-
-        # Step 2: Generate analysis rasters
-        aspect_raster = self.generate_analysis_raster("aspect")
-
-        # Step 3: Reproject rasters to EPSG:4326
-        reprojected_slope = os.path.join(self.output_base_dir, f"{self.filename}_slope_4326.tif")
-
-        self.reproject_raster(slope_raster, reprojected_slope)
-
-        # Step 4: Cleanup raw GeoTIFFs and GPKG
-        self.cleanup_files(slope_raster, aspect_raster, tri_raster, tpi_raster, roughness_raster, self.gpkg_file)
+        self.generate_interpolated_raster()
 
 class ParquetProcessor:
     def __init__(self, input_base_dir, output_base_dir):
@@ -119,13 +80,13 @@ class ParquetProcessor:
         tasks = []
         for root, dirs, files in os.walk(self.input_base_dir):
             for file in files:
-                if file == "dtm.parquet":  # Only process dtm.parquet files
+                if file == "dtm.parquet":
                     input_file = os.path.join(root, file)
                     relative_path = os.path.relpath(root, self.input_base_dir)
                     tasks.append((input_file, relative_path))
 
         # Use multiprocessing to parallelize the work
-        with Pool(processes=cpu_count()) as pool:
+        with Pool(processes=cpu_count()-1) as pool:
             list(tqdm.tqdm(pool.imap(self.process_parquet_file, tasks), total=len(tasks)))
 
 if __name__ == "__main__":
