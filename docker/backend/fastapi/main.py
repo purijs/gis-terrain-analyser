@@ -215,7 +215,7 @@ class GeohashService:
         logger.info(f"Starting geohash_grid_covering_polygon with resolution: {resolution}")
         try:
             minx, miny, maxx, maxy = polygon.bounds
-            lat_steps = 100  # Adjust based on desired granularity
+            lat_steps = 100  
             lon_steps = 100
 
             latitudes = np.linspace(miny, maxy, lat_steps)

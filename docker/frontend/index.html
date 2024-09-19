@@ -14,9 +14,9 @@
             position: absolute;
             z-index: 1;
             top: 10px;
-            left: 10px; /* Retained for better placement */
+            left: 10px; 
             border-radius: 3px;
-            width: 180px; /* Retained width for layout */
+            width: 180px;
             border: 1px solid rgba(0, 0, 0, 0.4);
             font-family: 'Open Sans', sans-serif;
             padding: 10px;
@@ -57,7 +57,7 @@
 
         #raster-menu a, #vector-menu a {
             text-align: left;
-            padding-left: 20px; /* Indent for hierarchy */
+            padding-left: 20px;
         }
 
         #menu a:last-child, #raster-menu a:last-child, #vector-menu a:last-child {
@@ -81,12 +81,11 @@
             border-radius: 8px;
         }
 
-        /* Warning Alert Styling */
+       
         .alert-custom {
             margin-bottom: 20px;
         }
 
-        /* Developer Tools and Infra Monitor Links Styling */
         .top-links a {
             font-size: 14px;
             color: #007bff;
@@ -98,7 +97,6 @@
             text-decoration: underline;
         }
 
-        /* Legend Styling */
         #legend {
             margin-top: 20px;
         }
@@ -107,14 +105,12 @@
             margin-bottom: 10px;
         }
 
-        /* Progress Bar Styling */
         .progress {
             height: 25px;
             margin-top: 15px;
             margin-bottom: 15px;
         }
 
-        /* Modal Image Styling */
         .modal-img {
             width: 100%;
             height: auto;
@@ -139,7 +135,6 @@
             <div class="col-md-4">
                 <h2 style="text-align: center; margin-top: 25px;">Terrain Analysis</h2>
                 <div class="content-area">
-                    <!-- Developer Tools and Infra Monitor Links -->
                     <div class="content-block text-center top-links">
                         <a href="http://3.124.67.243:8080/docs" target="_blank">Developer Portal</a> | 
                         <a href="http://3.124.67.243:9200/" target="_blank">Infrastructure Monitor</a>
@@ -161,7 +156,6 @@
                         </div>
                     <hr>
                     
-                    <!-- Legend Section -->
                     <div id="legend" class="container text-center">
                         <h4 id="legend-title">Legend</h4>
                         <div id="legend-content">
@@ -169,25 +163,22 @@
                         <hr/>
                     </div>                    
     
-                    <!-- Warning Alert -->
                     <div class="alert alert-warning alert-custom" role="alert">
                         <strong>Warning:</strong> Draw small boundaries, covering only a few buildings to get instant results
                     </div>
 
-                    <!-- Progress Bar -->
                     <div class="progress" id="progressBar">
                         <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
                     </div>
 
-                    <!-- Insights Display -->
                     <div id="insights">
-                        <!-- Insights data will be populated here -->
+                       
                     </div>
     
-                    <!-- Footprint Analysis Section -->
                     <div class="content-block">
                         <h4>Footprint Analysis</h4>
-
+                        <p>Drop a point on any building or draw a polygon</p>
+                        <br>
                         <p>
                             <strong>Insights Extracted:</strong><br>
                             <ul>
@@ -217,12 +208,13 @@
 
         function addInsightsToHTML(buildingReports) {
             const insightsContainer = document.getElementById('insights');
-            insightsContainer.innerHTML = '';  // Clear previous insights
+            insightsContainer.innerHTML = '<p>Click on any highlighted building from Map or click on these links</p><br>'; 
     
-            // Loop through each building report and dynamically create HTML
+            // Loop through each building report 
             buildingReports.forEach((report, index) => {
-                // Create a collapsible card for each building report
+                // Create a collapsible card 
                 const card = `
+                    
                     <div class="card my-3">
                         <div class="card-header" id="heading${index}">
                             <h5 class="mb-0">
@@ -244,7 +236,6 @@
                     </div>
                 `;
     
-                // Append the card to the insights container
                 insightsContainer.innerHTML += card;
             });
         }
@@ -309,7 +300,6 @@
             zoom: 12
         });
     
-        // Initialize Mapbox Draw controls without any default mode
         const draw = new MapboxDraw({
             displayControlsDefault: false,
             controls: {
@@ -325,7 +315,6 @@
             const features = event.features;
             console.log('Drawn features:', features);
     
-            // Post the drawn polygon to FastAPI
             const geojson = {
                 "type": "FeatureCollection",
                 "features": features
@@ -351,7 +340,6 @@
                 // Highlight buildings in vector tile layer
                 const buildingIds = result.building_reports.map(report => report.building_id);
                 
-                // Remove existing highlight layer if it exists
                 if (map.getLayer('highlight-buildings')) {
                     map.removeLayer('highlight-buildings');
                 }
@@ -359,7 +347,6 @@
                     map.removeSource('highlight-buildings');
                 }
     
-                // Add a new source for highlighted buildings
                 map.addSource('highlight-buildings', {
                     'type': 'vector',
                     'tiles': ['http://3.124.67.243:9100/data/buildings/{z}/{x}/{y}.pbf'],
@@ -372,7 +359,7 @@
                     'id': 'highlight-buildings',
                     'type': 'fill',
                     'source': 'highlight-buildings',
-                    'source-layer': 'buildings',
+                    'source-layer': 'buildings_intersecting_grid',
                     'layout': { 'visibility': 'visible' },
                     'paint': {
                         'fill-color': '#00FF00',
@@ -577,7 +564,7 @@
                 'id': 'buildings-layer',
                 'type': 'fill',
                 'source': 'buildings',
-                'source-layer': 'buildings',
+                'source-layer': 'buildings_intersecting_grid',
                 'layout': { 'visibility': 'none' },
                 'paint': {
                     'fill-color': '#888888',
@@ -652,7 +639,7 @@
                 'id': 'highlight-buildings',
                 'type': 'fill',
                 'source': 'highlight-buildings',
-                'source-layer': 'buildings',
+                'source-layer': 'buildings_intersecting_grid',
                 'layout': { 'visibility': 'visible' },
                 'paint': {
                     'fill-color': '#00FF00',
@@ -660,7 +647,34 @@
                 },
                 'filter': ['in', 'gmlid', ...buildingIds]
             });
+
         }
+
+        map.on('click', 'highlight-buildings', (e) => {
+                // Get the clicked feature
+                console.log("Click event triggered");
+                const clickedFeatures = map.queryRenderedFeatures(e.point, {
+                    layers: ['highlight-buildings']
+                });
+
+                if (clickedFeatures.length) {
+                    const feature = clickedFeatures[0];
+
+                    const properties = feature.properties;
+
+                    new mapboxgl.Popup()
+                        .setLngLat(e.lngLat)
+                        .setHTML(`
+                            <b>Building Info</b>
+                            <p><strong>ID:</strong> ${properties.gmlid}</p>
+                            <p><strong>Zip:</strong> ${properties.zip_code}</p>
+                            <p><strong>City:</strong> ${properties.city}</p>
+                            <p><strong>Storeys:</strong> ${properties.storeys_wo_attic}</p>
+                            <p><strong>Ridge Height:</strong> ${properties.ridge_height}</p>
+                        `)
+                        .addTo(map);
+                }
+            });
         
         </script>    
     
