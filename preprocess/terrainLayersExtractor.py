@@ -38,66 +38,75 @@ def run_gdaldem(command, output_file, cog_output_file):
         print(f"Error running command: {e}")
         sys.exit(1)
 
-def generate_terrain_layers(slope_raster):
+def generate_terrain_layers(interpolated_raster):
     """
     Generate TPI, TRI, Roughness, and Aspect layers from the input slope raster.
     
     Parameters:
-    - slope_raster: str, path to the input slope raster
+    - interpolated_raster: str, path to the input slope raster
     """
     output_paths = {
-        "tri": "global_rasters/merged_tri.tif",
-        "tpi": "global_rasters/merged_tpi.tif",
-        "roughness": "global_rasters/merged_roughness.tif",
-        "aspect": "global_rasters/merged_aspect.tif"
+        "tri": "data/output/tif/cog_merged_tri.tif",
+        "tpi": "data/output/tif/cog_merged_tpi.tif",
+        "roughness": "data/output/tif/cog_merged_roughness.tif",
+        "aspect": "data/output/tif/cog_merged_aspect.tif",
+        "slope": "data/output/tif/cog_merged_slope.tif"
     }
 
     intermediate_files = {
-        "tri": "temp_tri.tif",
-        "tpi": "temp_tpi.tif",
-        "roughness": "temp_roughness.tif",
-        "aspect": "temp_aspect.tif"
+        "tri": "data/output/tif/temp_tri.tif",
+        "tpi": "data/output/tif/temp_tpi.tif",
+        "roughness": "data/output/tif/temp_roughness.tif",
+        "aspect": "data/output/tif/temp_aspect.tif",
+        "slope": "data/output/tif/temp_slope.tif"
     }
 
     # Generate TRI (Terrain Ruggedness Index)
     run_gdaldem(
-        ["gdaldem", "TRI", slope_raster, intermediate_files["tri"], "-co", "COMPRESS=LZW"],
+        ["gdaldem", "TRI", interpolated_raster, intermediate_files["tri"], "-co", "COMPRESS=LZW"],
         intermediate_files["tri"],
         output_paths["tri"]
     )
 
     # Generate TPI (Topographic Position Index)
     run_gdaldem(
-        ["gdaldem", "TPI", slope_raster, intermediate_files["tpi"], "-co", "COMPRESS=LZW"],
+        ["gdaldem", "TPI", interpolated_raster, intermediate_files["tpi"], "-co", "COMPRESS=LZW"],
         intermediate_files["tpi"],
         output_paths["tpi"]
     )
 
     # Generate Roughness
     run_gdaldem(
-        ["gdaldem", "roughness", slope_raster, intermediate_files["roughness"], "-co", "COMPRESS=LZW"],
+        ["gdaldem", "roughness", interpolated_raster, intermediate_files["roughness"], "-co", "COMPRESS=LZW"],
         intermediate_files["roughness"],
         output_paths["roughness"]
     )
 
     # Generate Aspect
     run_gdaldem(
-        ["gdaldem", "aspect", slope_raster, intermediate_files["aspect"], "-co", "COMPRESS=LZW"],
+        ["gdaldem", "aspect", interpolated_raster, intermediate_files["aspect"], "-co", "COMPRESS=LZW"],
         intermediate_files["aspect"],
         output_paths["aspect"]
     )
 
+    # Generate Slope
+    run_gdaldem(
+        ["gdaldem", "slope", interpolated_raster, intermediate_files["slope"], "-co", "COMPRESS=LZW"],
+        intermediate_files["slope"],
+        output_paths["slope"]
+    )
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python terrainLayersExtractor.py <input_slope_raster>")
+        print("Usage: python terrainLayersExtractor.py <input_interpolated_raster>")
         sys.exit(1)
 
     # Get the input slope raster from command-line argument
-    input_slope_raster = sys.argv[1]
+    input_interpolated_raster = sys.argv[1]
 
-    if not os.path.exists(input_slope_raster):
-        print(f"Error: Input file '{input_slope_raster}' does not exist.")
+    if not os.path.exists(input_interpolated_raster):
+        print(f"Error: Input file '{input_interpolated_raster}' does not exist.")
         sys.exit(1)
 
     # Generate terrain layers
-    generate_terrain_layers(input_slope_raster)
+    generate_terrain_layers(input_interpolated_raster)
