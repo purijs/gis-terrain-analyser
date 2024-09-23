@@ -34,7 +34,7 @@ This table provides a high-level summary for different stages of processing the 
 
 This diagram depicts the high-level working of different scripts for preparing the data
 
-![](../images/credium.drawio.png)
+![](../images/architecture.png)
 
 ### Workflow Highlights
 
