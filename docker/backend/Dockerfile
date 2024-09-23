@@ -28,6 +28,6 @@ USER appuser
 EXPOSE 8080
 
 COPY ./fastapi/main.py ${TASK_ROOT}/fastapi/main.py
-COPY ./fastapi/unittests.py ${TASK_ROOT}/fastapi/unittests.py
+COPY ./fastapi/test_unittests.py ${TASK_ROOT}/fastapi/unittests.py
 
 CMD ["bash", "-c", "PYTHONPATH=${TASK_ROOT}/fastapi uvicorn main:app --host 0.0.0.0 --port 8080 --log-level debug --timeout-keep-alive 300"]

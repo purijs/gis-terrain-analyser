@@ -439,6 +439,10 @@ class BuildingService:
         }
 
         logger.info("Generated zonal geometries for north, south, east, and west.")
+        logger.info("North: "+str(zones['north']))
+        logger.info("South: "+str(zones['south']))
+        logger.info("East: "+str(zones['east']))
+        logger.info("West: "+str(zones['west']))
 
         zonal_stats = {}
         for zone_name, zone_geom in zones.items():
@@ -472,6 +476,8 @@ class BuildingService:
 
         direction_percentage = 0.4
 
+        logger.info("Buffer Poly: "+str(buffer_ring))
+
         directions = {
             'north': buffer_ring.intersection(Polygon([
                 (minx, maxy - height * direction_percentage),
@@ -500,6 +506,10 @@ class BuildingService:
         }
 
         logger.info("Generated neighborhood geometries for north, south, east, and west.")
+        logger.info("Buffer North: "+str(directions['north']))
+        logger.info("Buffer South: "+str(directions['south']))
+        logger.info("Buffer East: "+str(directions['east']))
+        logger.info("Buffer West: "+str(directions['west']))
 
         neighborhood_stats = {}
         for direction, direction_geom in directions.items():
