@@ -13,11 +13,7 @@
 
 ---
 
-**Live Application**: [Terrain Mapper](http://3.124.67.243:8081) (Please select 'Continue to Un-Secure Link' if asked, since it's an IP Address)
-
-**Documentation**: [Wiki Docs](docs/)
-
-**Infrastructure Dashboard**: [Infra Dashboard](http://3.124.67.243:9200)
+**Demo Video**: [Terrain Mapper](https://drive.google.com/file/d/1BZSnPprDkvI7QWr4qN43fgBTHFhJQrZy/view?usp=sharing)
 
 ---
 
@@ -313,7 +309,7 @@ Users can monitor their polygonal or point-based requests through the Infrastruc
 
 - **Tracking Steps**:
   1. Navigate to the **Infrastructure Monitor**.
-  2. Select the `credium_backend.1` container.
+  2. Select the `terrain_backend.1` container.
   3. View the logs for FastAPI endpoint interactions related to your requests (Polygonal/Point requests only)
 
 ### Testing with Swagger API
@@ -391,7 +387,7 @@ docker swarm init
 - Deploy Docker Services
 
 ```
-docker stack deploy --compose-file docker-compose.yml credium
+docker stack deploy --compose-file docker-compose.yml terrain
 ```
 
 This will start the various services (frontend, backend, raster titiler, vector tileserver, and monitoring) as defined in the Docker Compose file.
