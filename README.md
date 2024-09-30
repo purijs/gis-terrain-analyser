@@ -15,6 +15,8 @@
 
 **Demo Video**: [Terrain Mapper](https://drive.google.com/file/d/1BZSnPprDkvI7QWr4qN43fgBTHFhJQrZy/view?usp=sharing)
 
+**Docs**: [Wiki](https://github.com/purijs/gis-terrain-analyser/wiki/Terrain-Mapper)
+
 ---
 
 ## Overview
